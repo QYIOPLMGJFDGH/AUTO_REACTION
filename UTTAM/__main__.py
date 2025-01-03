@@ -110,6 +110,11 @@ async def anony_boot():
     # Keep the bot idle to listen for commands
     await idle()
 
+# This is where we create a task for restarting the main bot asynchronously
+async def main():
+    # Run the anony_boot function
+    await anony_boot()
+
 if __name__ == "__main__":
-    asyncio.get_event_loop().run_until_complete(anony_boot())
+    asyncio.run(main())  # Using asyncio.run() for cleaner event loop management
     LOGGER.info("Stopping UTTAM Bot...")
