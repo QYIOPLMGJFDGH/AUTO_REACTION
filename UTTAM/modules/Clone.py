@@ -13,7 +13,7 @@ from config import API_HASH, API_ID, OWNER_ID
 from UTTAM import CLONE_OWNERS
 from UTTAM import UTTAM as app, save_clonebot_owner
 from UTTAM import db as mongodb
-from UTTAM import restart_mainbot
+from UTTAM.__main__ import restart_mainbot
 
 CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
