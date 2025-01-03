@@ -151,7 +151,12 @@ async def delete_cloned_bot(client, message):
 
         # Stop the bot immediately to prevent any further operations
         ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
-        await ai.stop()  # Stops the bot immediately
+        
+        # Check if bot is already stopped or terminated
+        if not ai.is_connected:
+            await ok.edit_text("**The bot is already stopped or terminated.**")
+        else:
+            await ai.stop()  # Stops the bot immediately
         
         # Remove the cloned bot from the database and set
         await clonebotdb.delete_one({"token": bot_token})
