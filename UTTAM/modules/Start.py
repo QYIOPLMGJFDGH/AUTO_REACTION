@@ -18,16 +18,27 @@ from UTTAM.modules.helpers import (
 async def start_message(client: Client, message: Message):
     reaction_bot = await client.get_me()
     buttons = [
-        [InlineKeyboardButton("✙ ʌᴅᴅ ϻє ʙᴀʙу ✙", url=f"http://t.me/{reaction_bot.username}?startgroup=botstart")],
-        [InlineKeyboardButton("⌯ 𝛅ᴜᴘᴘᴏʀᴛ ⌯", url="https://t.me/PURVI_SUPPORT"),
-         InlineKeyboardButton("⌯ 𝖴ᴘᴅᴀᴛᴇs ⌯", url="https://t.me/PURVI_UPDATES")],
-        [InlineKeyboardButton("⌯ 𝖧ᴇʟᴘ ᴧηᴅ 𝖢ᴏϻϻᴧηᴅs ⌯", callback_data="HELP")]
+        [InlineKeyboardButton("Join 👋", url="https://t.me/BABY09_WORLD")],
     ]
-    photo_url = "https://files.catbox.moe/8vbfvp.jpg"
-    await client.send_photo(
+    await client.send_text(
         chat_id=message.chat.id,
-        photo=photo_url,
-        caption=f"**✦ » ʜᴇʏ {message.from_user.mention}!**\n**✦ ɪ'ᴍ ʏᴏᴜʀ ᴀᴜᴛᴏ ʀᴇᴀᴄᴛɪᴏɴ ʙᴏᴛ !!**\n\n**◆ ɪ'ᴍ ʀᴇᴀᴄᴛ ᴛᴏ ᴇᴠᴇʀʏ ᴍᴇssᴀɢᴇ ɪɴ ɢʀᴏᴜᴘs, ᴄʜᴀɴɴᴇʟs, ᴀɴᴅ ᴘʀɪᴠᴀᴛᴇ ᴄʜᴀᴛs ᴡɪᴛʜ ᴀ ʀᴀɴᴅᴏᴍ ᴇᴍᴏᴊɪ..!!**\n\n**✦ 𝖶ɪᴛʜ /clone ᴀɴᴅ /broadcast ғᴇᴀᴛᴜʀᴇs.**\n\n**✦ 𝐏ᴏᴡᴇʀᴇᴅ 𝖡ʏ » [⎯᪵፝֟፝֟⎯꯭𓆩꯭ 𝐀 ꯭ʟ ꯭ᴘ ꯭ʜ꯭ ᴧ꯭⎯꯭꯭‌꯭🥂꯭༎꯭ 𓆪](t.me/ll_ALPHA_BABY_lll)**",
+        text="""𝐇𝐞𝐲, 𝐈 𝐚𝐦 𝐚 𝐚𝐮𝐭𝐨 𝐫𝐞𝐚𝐜𝐭𝐢𝐨𝐧 𝐛𝐨𝐭!
+
+Aᴅᴅ ᴍᴇ ᴛᴏ ʏᴏᴜʀ ɢʀᴏᴜᴘ/ᴄʜᴀɴɴᴇʟ ᴛᴏ ɢᴇᴛ ᴇᴍᴏᴊɪ ʀᴇᴀᴄᴛɪᴏɴs!
+Tᴏ jᴏɪɴ, clɪcᴋ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ:
+
+𝐔𝐒𝐄𝐅𝐔𝐋 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒:
+/start - Sᴛᴀʀᴛ ʏᴏᴜʀ ʙᴏᴛ ᴀɴᴅ ɢᴇᴛ ʜᴇʟᴘ ɪɴғᴏ
+/mybot - Lɪsᴛ ᴏғ ʏᴏᴜʀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ
+/clone {bot_token} - Clᴏɴᴇ ᴀ boᴛ ᴡɪᴛʜ ᴛʜᴇ ᴛᴏᴋᴇɴ @BotFather
+
+𝐎𝐖𝐍𝐄𝐑 𝐂𝐎𝐌𝐌𝐀𝐍𝐃𝐒:
+/cloned - Lɪsᴛ ᴏғ ᴀʟʟ cloɴᴇᴅ ʙᴏᴛ ɪɴ ᴛʜᴇ sʏsᴛᴇᴍ
+/del {username} - Dᴇʟᴇᴛᴇ ᴀ ᴄʟᴏɴᴇᴅ ʙᴏᴛ ɪɴ ᴛʜᴇ sʏsᴛᴇᴍ
+
+𝐍ᴏᴛᴇ: Tʜɪs ʙᴏᴛ ɪs ᴄᴏsᴛ-ғʀᴇᴇ ᴛᴏ ᴜsᴇ!
+
+Tᴏ jᴏɪɴ, clɪᴄᴋ ᴛʜᴇ ʙᴜᴛᴛᴏɴ ʙᴇʟᴏᴡ:""",
         reply_markup=InlineKeyboardMarkup(buttons)
     )
     
