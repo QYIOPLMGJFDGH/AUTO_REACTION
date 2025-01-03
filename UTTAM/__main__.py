@@ -50,7 +50,7 @@ async def restart_bots():
         
     except Exception as e:
         logging.exception("Error while restarting bots.")
-        
+
 # Function to restart the main bot (stop and start again)
 async def restart_mainbot():
     try:
@@ -68,29 +68,26 @@ async def restart_mainbot():
 # Function to start the anonymous bot
 async def anony_boot():
     try:
-        await UTTAM.start()
+        await nexichat.start()
         try:
-            await UTTAM.send_message(int(OWNER_ID), f"**{UTTAM.mention} Is started✅**")
+            await nexichat.send_message(int(OWNER_ID), f"**{nexichat.mention} Is started✅**")
         except Exception as ex:
-            LOGGER.info(f"@{UTTAM.username} Started, please start the bot from owner id.")
+            LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
     
-        # Start restarting all cloned bots
         asyncio.create_task(restart_bots())
         
-        # Load clone owners
         await load_clone_owners()
         
     except Exception as ex:
         LOGGER.error(ex)
 
-    # Import all modules dynamically
     for all_module in ALL_MODULES:
-        importlib.import_module("UTTAM.modules." + all_module)
+        importlib.import_module("nexichat.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
-    # Set bot commands
+    
     try:
-        await UTTAM.set_bot_commands(
+        await nexichat.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
                 BotCommand("clone", "Make your own reaction bot"),
@@ -105,16 +102,17 @@ async def anony_boot():
     except Exception as ex:
         LOGGER.error(f"Failed to set bot commands: {ex}")
     
-    LOGGER.info(f"Bot Started.")
+    LOGGER.info(f"@{nexichat.username} Started.")
     
-    # Keep the bot idle to listen for commands
     await idle()
-
 # This is where we create a task for restarting the main bot asynchronously
 async def main():
     # Run the anony_boot function
     await anony_boot()
 
 if __name__ == "__main__":
-    asyncio.run(main())  # Using asyncio.run() for cleaner event loop management
-    LOGGER.info("Stopping UTTAM Bot...")
+    try:
+        asyncio.run(main())  # Using asyncio.run() for cleaner event loop management
+        LOGGER.info("Stopping UTTAM Bot...")
+    except Exception as e:
+        LOGGER.error(f"Error during bot startup: {e}")
