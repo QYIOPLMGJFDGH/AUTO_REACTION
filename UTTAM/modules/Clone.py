@@ -24,61 +24,66 @@ async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
         mi = await message.reply_text("Please wait while I check the bot token.")
+
+        bot = None  # Initialize bot variable to avoid UnboundLocalError
         try:
             ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
             await ai.start()
-            bot = await ai.get_me()
+            bot = await ai.get_me()  # This will assign the bot object
             bot_id = bot.id
             user_id = message.from_user.id
             await save_clonebot_owner(bot_id, user_id)
             await ai.set_bot_commands([
-                    BotCommand("start", "Start the bot"),
-                    BotCommand("clone", "Make your own reaction bot"),
-                    BotCommand("ping", "Check if the bot is alive or dead"),
-                    BotCommand("id", "Get users user_id"),
-                    BotCommand("stats", "Check bot stats"),
-                    BotCommand("gcast", "Broadcast any message to groups/users"),
-           ])
+                BotCommand("start", "Start the bot"),
+                BotCommand("clone", "Make your own reaction bot"),
+                BotCommand("ping", "Check if the bot is alive or dead"),
+                BotCommand("id", "Get users user_id"),
+                BotCommand("stats", "Check bot stats"),
+                BotCommand("gcast", "Broadcast any message to groups/users"),
+            ])
         except (AccessTokenExpired, AccessTokenInvalid):
             await mi.edit_text("**Invalid bot token. Please provide a valid one.**")
             return
         except Exception as e:
+            # Check if bot was already cloned before
             cloned_bot = await clonebotdb.find_one({"token": bot_token})
             if cloned_bot:
                 await mi.edit_text("**🤖 Your bot is already cloned ✅**")
                 return
 
-        await mi.edit_text("**Cloning process started. Please wait for the bot to start.**")
-        try:
-            details = {
-                "bot_id": bot.id,
-                "is_bot": True,
-                "user_id": user_id,
-                "name": bot.first_name,
-                "token": bot_token,
-                "username": bot.username,
-            }
-            cloned_bots = clonebotdb.find()
-            cloned_bots_list = await cloned_bots.to_list(length=None)
-            total_clones = len(cloned_bots_list)
-            await clonebotdb.insert_one(details)
-            CLONES.add(bot.id)
-            
-            await app.send_message(
-                int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
-            )
+        if bot:  # Ensure that the bot object is assigned before proceeding
+            await mi.edit_text("**Cloning process started. Please wait for the bot to start.**")
+            try:
+                details = {
+                    "bot_id": bot.id,
+                    "is_bot": True,
+                    "user_id": user_id,
+                    "name": bot.first_name,
+                    "token": bot_token,
+                    "username": bot.username,
+                }
+                cloned_bots = clonebotdb.find()
+                cloned_bots_list = await cloned_bots.to_list(length=None)
+                total_clones = len(cloned_bots_list)
+                await clonebotdb.insert_one(details)
+                CLONES.add(bot.id)
 
-            await mi.edit_text(
-                f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove clone by :- /delclone**\n**Check all cloned bot list by:- /cloned**"
-            )
-        
-        except PeerIdInvalid as e:
-            await mi.edit_text(f"**Your Bot Siccessfully Cloned👍**\n**You can check by /cloned**\n\n**But please start me (@{app.username}) From owner id**")
-        except BaseException as e:
-            logging.exception("Error while cloning bot.")
-            await mi.edit_text(
-                f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @ll_ALPHA_BABY_lll for assistance**"
-            )
+                await app.send_message(
+                    int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
+                )
+
+                await mi.edit_text(
+                    f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove clone by :- /delclone**\n**Check all cloned bot list by:- /cloned**"
+                )
+            except PeerIdInvalid:
+                await mi.edit_text(f"**Your Bot Successfully Cloned👍**\n**You can check by /cloned**\n\n**But please start me (@{app.username}) From owner id**")
+            except Exception as e:
+                logging.exception("Error while cloning bot.")
+                await mi.edit_text(
+                    f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @ll_ALPHA_BABY_lll for assistance**"
+                )
+        else:
+            await mi.edit_text("**An error occurred. Bot information could not be retrieved.**")
     else:
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
