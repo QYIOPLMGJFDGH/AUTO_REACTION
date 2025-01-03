@@ -170,7 +170,7 @@ async def restart_bots():
         
         async def restart_bot(bot):
             bot_token = bot["token"]
-            ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="nexichat/mplugin"))
+            ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
             try:
                 await ai.start()
                 bot_info = await ai.get_me()
