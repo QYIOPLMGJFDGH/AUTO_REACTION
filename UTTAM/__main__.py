@@ -15,31 +15,38 @@ from UTTAM.modules.Clone import restart_bots
 async def anony_boot():
     try:
         await UTTAM.start()
-        try:
-            await UTTAM.send_message(int(OWNER_ID), f"**{UTTAM.mention} Is started✅**")
-        except Exception as ex:
-            LOGGER.info(f"@{UTTAM.username} Started, please start the bot from owner id.")
-    
-        asyncio.create_task(restart_bots())
-        
-        await load_clone_owners()
-        
-    except Exception as ex:
-        LOGGER.error(ex)
 
+        # Fetch bot information to populate attributes like username and mention
+        bot_info = await UTTAM.get_me()
+        UTTAM.username = bot_info.username  # Set the username
+        UTTAM.mention = bot_info.mention    # Set the mention
+
+        try:
+            await UTTAM.send_message(
+                int(OWNER_ID), f"**{UTTAM.mention} is started✅**"
+            )
+        except Exception as ex:
+            LOGGER.info(f"Bot started, but unable to send a message to OWNER_ID. Error: {ex}")
+
+        asyncio.create_task(restart_bots())
+        await load_clone_owners()
+
+    except Exception as ex:
+        LOGGER.error(f"Error during bot startup: {ex}")
+
+    # Import all modules
     for all_module in ALL_MODULES:
         importlib.import_module("UTTAM.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
-    
     try:
         await UTTAM.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
                 BotCommand("clone", "Make your own reaction bot"),
-                BotCommand("cloned", "Get List of all cloned bot"),
+                BotCommand("cloned", "Get List of all cloned bots"),
                 BotCommand("ping", "Check if the bot is alive or dead"),
-                BotCommand("id", "Get users user_id"),
+                BotCommand("id", "Get user's user_id"),
                 BotCommand("stats", "Check bot stats"),
                 BotCommand("gcast", "Broadcast any message to groups/users"),
             ]
@@ -47,10 +54,12 @@ async def anony_boot():
         LOGGER.info("Bot commands set successfully.")
     except Exception as ex:
         LOGGER.error(f"Failed to set bot commands: {ex}")
-    
-    LOGGER.info(f"@{UTTAM.username} Started.")
+
+    # Log bot startup message
+    LOGGER.info(f"@{UTTAM.username} started successfully.")
     
     await idle()
+
 
 
 app = Flask(__name__)
