@@ -25,7 +25,7 @@ async def anony_boot():
         LOGGER.error(ex)
 
     for all_module in ALL_MODULES:
-        importlib.import_module("nexichat.modules." + all_module)
+        importlib.import_module("UTTAM.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
     
