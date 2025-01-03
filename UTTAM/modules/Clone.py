@@ -149,22 +149,6 @@ async def delete_cloned_bot(client, message):
             await ok.edit_text("**⚠️ You are not authorized to delete this cloned bot.**")
             return
 
-        # Initialize the client for the bot
-        ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
-        
-        # Ensure bot is running or connected, if not, stop is redundant
-        if ai.is_connected:
-            try:
-                await ai.stop()  # Attempt to stop the bot
-                logging.info(f"Bot with token {bot_token} stopped successfully.")
-            except Exception as stop_error:
-                # Handle failure to stop bot
-                logging.error(f"Error stopping bot {bot_token}: {stop_error}")
-                await ok.edit_text(f"**⚠️ Failed to stop the bot. Error: {stop_error}**")
-        else:
-            logging.info(f"Bot with token {bot_token} is already stopped or not connected.")
-            await ok.edit_text("**The bot is already stopped or was never started.**")
-
         # Remove the cloned bot from the database and set
         await clonebotdb.delete_one({"token": bot_token})
         CLONES.discard(cloned_bot["bot_id"])
@@ -173,11 +157,13 @@ async def delete_cloned_bot(client, message):
             f"**🤖 The cloned bot has been removed from my database ✅**\n"
             f"**🔄 Kindly revoke the bot token from @botfather to prevent misuse.**"
         )
+
+        # Call the anonymous bot restart here
+        await anony_bot_restart()  # Restart anonymous bot function
+
     except Exception as e:
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
         logging.exception(e)
-
-
 
 
 async def restart_bots():
