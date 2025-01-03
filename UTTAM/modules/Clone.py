@@ -149,6 +149,10 @@ async def delete_cloned_bot(client, message):
             await ok.edit_text("**⚠️ You are not authorized to delete this cloned bot.**")
             return
 
+        # Stop the bot immediately to prevent any further operations
+        ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
+        await ai.stop()  # Stops the bot immediately
+        
         # Remove the cloned bot from the database and set
         await clonebotdb.delete_one({"token": bot_token})
         CLONES.discard(cloned_bot["bot_id"])
@@ -160,6 +164,7 @@ async def delete_cloned_bot(client, message):
     except Exception as e:
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
         logging.exception(e)
+
 
 
 async def restart_bots():
