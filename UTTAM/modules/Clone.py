@@ -114,19 +114,30 @@ async def delete_cloned_bot(client, message):
         bot_token = " ".join(message.command[1:])
         ok = await message.reply_text("**Checking the bot token...**")
 
+        # Fetch cloned bot details
         cloned_bot = await clonebotdb.find_one({"token": bot_token})
-        if cloned_bot:
-            await clonebotdb.delete_one({"token": bot_token})
-            CLONES.remove(cloned_bot["bot_id"])
+        if not cloned_bot:
+            await ok.edit_text("**❌ No cloned bot found with the provided token.**")
+            return
 
-            await ok.edit_text(
-                f"**🤖 your cloned bot has been removed from my database ✅**\n**🔄 Kindly revoke your bot token from @botfather otherwise your bot will stop when @{app.username} will restart ☠️**"
-            )
-        else:
-            await message.reply_text("**Provide Bot Token after /delclone Command from @Botfather.**\n\n**Example:** `/delclone bot token paste here`")
+        # Check if the user is the owner of the bot or the main OWNER_ID
+        user_id = message.from_user.id
+        if cloned_bot["user_id"] != user_id and user_id != int(OWNER_ID):
+            await ok.edit_text("**⚠️ You are not authorized to delete this cloned bot.**")
+            return
+
+        # Remove the cloned bot from the database and set
+        await clonebotdb.delete_one({"token": bot_token})
+        CLONES.discard(cloned_bot["bot_id"])
+
+        await ok.edit_text(
+            f"**🤖 The cloned bot has been removed from my database ✅**\n"
+            f"**🔄 Kindly revoke the bot token from @botfather to prevent misuse.**"
+        )
     except Exception as e:
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
         logging.exception(e)
+
 
 async def restart_bots():
     global CLONES
