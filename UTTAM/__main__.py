@@ -3,7 +3,7 @@ import asyncio
 import logging 
 import importlib
 from pyrogram import idle
-import config
+from config import API_ID, API_HASH
 from pyrogram.types import BotCommand
 from config import OWNER_ID
 from pyrogram import Client
