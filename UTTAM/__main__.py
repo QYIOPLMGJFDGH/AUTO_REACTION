@@ -11,11 +11,11 @@ from UTTAM.modules.Clone import restart_bots
 
 async def anony_boot():
     try:
-        await nexichat.start()
+        await UTTAM.start()
         try:
-            await nexichat.send_message(int(OWNER_ID), f"**{nexichat.mention} Is started✅**")
+            await UTTAM.send_message(int(OWNER_ID), f"**{UTTAM.mention} Is started✅**")
         except Exception as ex:
-            LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
+            LOGGER.info(f"@{UTTAM.username} Started, please start the bot from owner id.")
     
         asyncio.create_task(restart_bots())
         
@@ -30,7 +30,7 @@ async def anony_boot():
 
     
     try:
-        await nexichat.set_bot_commands(
+        await UTTAM.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
                 BotCommand("clone", "Make your own reaction bot"),
@@ -47,8 +47,6 @@ async def anony_boot():
     
     LOGGER.info(f"Bot Started.")
     
-    await idle()
-
     await idle()
 
 if __name__ == "__main__":
