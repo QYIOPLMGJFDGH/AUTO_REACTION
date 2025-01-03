@@ -20,7 +20,7 @@ async def start_message(client: Client, message: Message):
     buttons = [
         [InlineKeyboardButton("Join 👋", url="https://t.me/BABY09_WORLD")],
     ]
-    await client.send_text(
+    await client.send_message(
         chat_id=message.chat.id,
         text="""𝐇𝐞𝐲, 𝐈 𝐚𝐦 𝐚 𝐚𝐮𝐭𝐨 𝐫𝐞𝐚𝐜𝐭𝐢𝐨𝐧 𝐛𝐨𝐭!
 
