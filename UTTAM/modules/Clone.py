@@ -32,13 +32,13 @@ async def clone_txt(client, message):
             user_id = message.from_user.id
             await save_clonebot_owner(bot_id, user_id)
             await ai.set_bot_commands([
-                BotCommand("start", "Start the bot"),
-                BotCommand("clone", "Make your own reaction bot"),
-                BotCommand("ping", "Check if the bot is alive or dead"),
-                BotCommand("id", "Get users user_id"),
-                BotCommand("stats", "Check bot stats"),
-                BotCommand("gcast", "Broadcast any message to groups/users"),
-            ])
+                    BotCommand("start", "Start the bot"),
+                    BotCommand("clone", "Make your own reaction bot"),
+                    BotCommand("ping", "Check if the bot is alive or dead"),
+                    BotCommand("id", "Get users user_id"),
+                    BotCommand("stats", "Check bot stats"),
+                    BotCommand("gcast", "Broadcast any message to groups/users"),
+           ])
         except (AccessTokenExpired, AccessTokenInvalid):
             await mi.edit_text("**Invalid bot token. Please provide a valid one.**")
             return
@@ -58,12 +58,12 @@ async def clone_txt(client, message):
                 "token": bot_token,
                 "username": bot.username,
             }
-            cloned_bots = await clonebotdb.find().to_list(length=None)
-            total_clones = len(cloned_bots)
+            cloned_bots = clonebotdb.find()
+            cloned_bots_list = await cloned_bots.to_list(length=None)
+            total_clones = len(cloned_bots_list)
             await clonebotdb.insert_one(details)
             CLONES.add(bot.id)
-
-            # Notify the owner about the new clone
+            
             await app.send_message(
                 int(OWNER_ID), f"**#New_Clone**\n\n**Bot:- @{bot.username}**\n\n**Details:-**\n{details}\n\n**Total Cloned:-** {total_clones}"
             )
@@ -71,15 +71,14 @@ async def clone_txt(client, message):
             await mi.edit_text(
                 f"**Bot @{bot.username} has been successfully cloned and started ✅.**\n**Remove clone by :- /delclone**\n**Check all cloned bot list by:- /cloned**"
             )
-            
-            # Call restart_bots to restart the cloned bots
-            await restart_bots()
-
-        except PeerIdInvalid:
-            await mi.edit_text(f"**Your bot has been successfully cloned👍**\n**You can check by /cloned**\n\n**But please start me (@{app.username}) From owner id**")
-        except Exception as e:
-            logging.exception(f"Error while cloning bot with token {bot_token}: {e}")
-            await mi.edit_text(f"⚠️ **Error**:\n\n<code>{e}</code>\n\n**Please contact @ll_ALPHA_BABY_lll for help.**")
+        
+        except PeerIdInvalid as e:
+            await mi.edit_text(f"**Your Bot Siccessfully Cloned👍**\n**You can check by /cloned**\n\n**But please start me (@{app.username}) From owner id**")
+        except BaseException as e:
+            logging.exception("Error while cloning bot.")
+            await mi.edit_text(
+                f"⚠️ <b>Error:</b>\n\n<code>{e}</code>\n\n**Forward this message to @ll_ALPHA_BABY_lll for assistance**"
+            )
     else:
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
@@ -153,9 +152,6 @@ async def delete_cloned_bot(client, message):
         # Remove the cloned bot from the database and set
         await clonebotdb.delete_one({"token": bot_token})
         CLONES.discard(cloned_bot["bot_id"])
-
-        # Restart all bots after deleting the cloned bot
-        await restart_bots()
 
         await ok.edit_text(
             f"**🤖 The cloned bot has been removed from my database ✅**\n"
