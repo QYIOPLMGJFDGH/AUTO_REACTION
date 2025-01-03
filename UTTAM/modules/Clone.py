@@ -166,43 +166,6 @@ async def delete_cloned_bot(client, message):
         logging.exception(e)
 
 
-async def restart_bots():
-    global CLONES
-    try:
-        logging.info("Restarting all cloned bots...")
-        bots = [bot async for bot in clonebotdb.find()]
-        
-        async def restart_bot(bot):
-            bot_token = bot["token"]
-            ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
-            try:
-                await ai.start()
-                bot_info = await ai.get_me()
-                await ai.set_bot_commands([
-                    BotCommand("start", "Start the bot"),
-                    BotCommand("clone", "Make your own reaction bot"),
-                    BotCommand("ping", "Check if the bot is alive or dead"),
-                    BotCommand("id", "Get users user_id"),
-                    BotCommand("stats", "Check bot stats"),
-                    BotCommand("gcast", "Broadcast any message to groups/users"),
-                ])
-
-                if bot_info.id not in CLONES:
-                    CLONES.add(bot_info.id)
-                    
-            except (AccessTokenExpired, AccessTokenInvalid):
-                await clonebotdb.delete_one({"token": bot_token})
-                logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
-            except Exception as e:
-                logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
-            
-        await asyncio.gather(*(restart_bot(bot) for bot in bots))
-        
-    except Exception as e:
-        logging.exception("Error while restarting bots.")
-
-
-
 @app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
     try:
