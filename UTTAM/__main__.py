@@ -16,7 +16,7 @@ async def anony_boot():
     try:
         await UTTAM.start()
 
-        # Fetch bot information to populate attributes like username and mention
+        # Fetch bot metadata (like username, id, etc.)
         bot_info = await UTTAM.get_me()
         UTTAM.username = bot_info.username  # Set the username
         UTTAM.mention = bot_info.mention    # Set the mention
@@ -26,18 +26,22 @@ async def anony_boot():
                 int(OWNER_ID), f"**{UTTAM.mention} is started✅**"
             )
         except Exception as ex:
-            LOGGER.info(f"Bot started, but unable to send a message to OWNER_ID. Error: {ex}")
+            LOGGER.warning(f"Bot started, but unable to send a message to OWNER_ID. Error: {ex}")
 
         asyncio.create_task(restart_bots())
         await load_clone_owners()
 
     except Exception as ex:
         LOGGER.error(f"Error during bot startup: {ex}")
+        return
 
     # Import all modules
     for all_module in ALL_MODULES:
-        importlib.import_module("UTTAM.modules." + all_module)
-        LOGGER.info(f"Successfully imported : {all_module}")
+        try:
+            importlib.import_module("UTTAM.modules." + all_module)
+            LOGGER.info(f"Successfully imported: {all_module}")
+        except Exception as ex:
+            LOGGER.error(f"Failed to import module {all_module}: {ex}")
 
     try:
         await UTTAM.set_bot_commands(
@@ -57,8 +61,9 @@ async def anony_boot():
 
     # Log bot startup message
     LOGGER.info(f"@{UTTAM.username} started successfully.")
-    
+
     await idle()
+
 
 
 
