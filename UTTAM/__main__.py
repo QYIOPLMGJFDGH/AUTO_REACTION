@@ -1,6 +1,6 @@
 import sys
 import asyncio
-import logging 
+import logging
 import importlib
 from pyrogram import idle
 from config import API_ID, API_HASH
@@ -15,6 +15,7 @@ CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
 
+# Function to restart all cloned bots
 async def restart_bots():
     global CLONES
     try:
@@ -50,6 +51,21 @@ async def restart_bots():
     except Exception as e:
         logging.exception("Error while restarting bots.")
         
+# Function to restart the main bot (stop and start again)
+async def restart_mainbot():
+    try:
+        logging.info("Stopping the main bot...")
+        await UTTAM.stop()  # Stop the main bot
+        logging.info("Main bot stopped.")
+        
+        logging.info("Restarting the main bot...")
+        await UTTAM.start()  # Start the main bot again
+        logging.info("Main bot restarted successfully.")
+        
+    except Exception as e:
+        logging.error(f"Error during main bot restart: {e}")
+
+# Function to start the anonymous bot
 async def anony_boot():
     try:
         await UTTAM.start()
@@ -58,18 +74,21 @@ async def anony_boot():
         except Exception as ex:
             LOGGER.info(f"@{UTTAM.username} Started, please start the bot from owner id.")
     
+        # Start restarting all cloned bots
         asyncio.create_task(restart_bots())
         
+        # Load clone owners
         await load_clone_owners()
         
     except Exception as ex:
         LOGGER.error(ex)
 
+    # Import all modules dynamically
     for all_module in ALL_MODULES:
         importlib.import_module("UTTAM.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
-    
+    # Set bot commands
     try:
         await UTTAM.set_bot_commands(
             commands=[
@@ -88,6 +107,7 @@ async def anony_boot():
     
     LOGGER.info(f"Bot Started.")
     
+    # Keep the bot idle to listen for commands
     await idle()
 
 if __name__ == "__main__":
