@@ -83,6 +83,28 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
 
+@app.on_message(filters.command("mybot"))
+async def list_user_cloned_bots(client, message):
+    try:
+        user_id = message.from_user.id
+        cloned_bots = clonebotdb.find({"user_id": user_id})
+        cloned_bots_list = await cloned_bots.to_list(length=None)
+        
+        if not cloned_bots_list:
+            await message.reply_text("You haven't cloned any bots yet.")
+            return
+        
+        text = f"**Your Cloned Bots:**\n\n"
+        for bot in cloned_bots_list:
+            text += f"**Bot ID:** `{bot['bot_id']}`\n"
+            text += f"**Bot Name:** {bot['name']}\n"
+            text += f"**Bot Username:** @{bot['username']}\n\n"
+        
+        await message.reply_text(text)
+    except Exception as e:
+        logging.exception(e)
+        await message.reply_text("**An error occurred while listing your cloned bots.**")
+
 
 @app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
