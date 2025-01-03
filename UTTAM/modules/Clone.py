@@ -153,13 +153,11 @@ async def delete_cloned_bot(client, message):
         # Remove the cloned bot from the database and set
         await clonebotdb.delete_one({"token": bot_token})
         CLONES.discard(cloned_bot["bot_id"])
-
+        await restart_mainbot()
         await ok.edit_text(
             f"**🤖 The cloned bot has been removed from my database ✅**\n"
             f"**🔄 Kindly revoke the bot token from @botfather to prevent misuse.**"
         )
-
-        await anony_boot()
 
     except Exception as e:
         await message.reply_text(f"**An error occurred while deleting the cloned bot:** {e}")
