@@ -5,8 +5,13 @@ import importlib
 from pyrogram import idle
 from pyrogram.types import BotCommand
 from config import OWNER_ID
+from UTTAM import db as mongodb
 from UTTAM import LOGGER, UTTAM, load_clone_owners
 from UTTAM.modules import ALL_MODULES
+
+CLONES = set()
+cloneownerdb = mongodb.cloneownerdb
+clonebotdb = mongodb.clonebotdb
 
 async def restart_bots():
     global CLONES
