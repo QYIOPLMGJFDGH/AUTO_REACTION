@@ -68,11 +68,11 @@ async def restart_mainbot():
 # Function to start the anonymous bot
 async def anony_boot():
     try:
-        await nexichat.start()
+        await UTTAM.start()
         try:
-            await nexichat.send_message(int(OWNER_ID), f"**{nexichat.mention} Is started✅**")
+            await UTTAM.send_message(int(OWNER_ID), f"**{UTTAM.mention} Is started✅**")
         except Exception as ex:
-            LOGGER.info(f"@{nexichat.username} Started, please start the bot from owner id.")
+            LOGGER.info(f"@{UTTAM.username} Started, please start the bot from owner id.")
     
         asyncio.create_task(restart_bots())
         
@@ -82,12 +82,12 @@ async def anony_boot():
         LOGGER.error(ex)
 
     for all_module in ALL_MODULES:
-        importlib.import_module("nexichat.modules." + all_module)
+        importlib.import_module("UTTAM.modules." + all_module)
         LOGGER.info(f"Successfully imported : {all_module}")
 
     
     try:
-        await nexichat.set_bot_commands(
+        await UTTAM.set_bot_commands(
             commands=[
                 BotCommand("start", "Start the bot"),
                 BotCommand("clone", "Make your own reaction bot"),
@@ -102,7 +102,7 @@ async def anony_boot():
     except Exception as ex:
         LOGGER.error(f"Failed to set bot commands: {ex}")
     
-    LOGGER.info(f"@{nexichat.username} Started.")
+    LOGGER.info(f"@{UTTAM.username} Started.")
     
     await idle()
 # This is where we create a task for restarting the main bot asynchronously
