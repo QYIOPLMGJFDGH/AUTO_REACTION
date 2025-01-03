@@ -13,14 +13,13 @@ from config import API_HASH, API_ID, OWNER_ID
 from UTTAM import CLONE_OWNERS
 from UTTAM import UTTAM as app, save_clonebot_owner
 from UTTAM import db as mongodb
-from UTTAM import UTTAM
 
 CLONES = set()
 cloneownerdb = mongodb.cloneownerdb
 clonebotdb = mongodb.clonebotdb
 
     
-@UTTAM.on_message(filters.command(["clone", "host", "deploy"]))
+@app.on_message(filters.command(["clone", "host", "deploy"]))
 async def clone_txt(client, message):
     if len(message.command) > 1:
         bot_token = message.text.split("/clone", 1)[1].strip()
@@ -84,7 +83,7 @@ async def clone_txt(client, message):
         await message.reply_text("**Provide Bot Token after /clone Command from @Botfather.**\n\n**Example:** `/clone bot token paste here`")
 
 
-@UTTAM.on_message(filters.command("cloned"))
+@app.on_message(filters.command("cloned"))
 async def list_cloned_bots(client, message):
     try:
         cloned_bots = clonebotdb.find()
@@ -103,7 +102,7 @@ async def list_cloned_bots(client, message):
         logging.exception(e)
         await message.reply_text("**An error occurred while listing cloned bots.**")
 
-@UTTAM.on_message(
+@app.on_message(
     filters.command(["deletecloned", "delcloned", "delclone", "deleteclone", "removeclone", "cancelclone"])
 )
 async def delete_cloned_bot(client, message):
@@ -165,7 +164,7 @@ async def restart_bots():
         logging.exception("Error while restarting bots.")
 
 
-@UTTAM.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
+@app.on_message(filters.command("delallclone") & filters.user(int(OWNER_ID)))
 async def delete_all_cloned_bots(client, message):
     try:
         a = await message.reply_text("**Deleting all cloned bots...**")
