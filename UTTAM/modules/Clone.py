@@ -167,7 +167,11 @@ async def delete_cloned_bot(client, message):
 
 
 
-# Global lock to ensure database operations are not concurrent
+import sqlite3
+import asyncio
+import logging
+
+# Global lock to ensure sequential database access
 db_lock = asyncio.Lock()
 
 async def restart_bots():
@@ -175,37 +179,44 @@ async def restart_bots():
     try:
         logging.info("Restarting all cloned bots...")
         bots = [bot async for bot in clonebotdb.find()]
-        
+
         async def restart_bot(bot):
             bot_token = bot["token"]
             ai = Client(bot_token, API_ID, API_HASH, bot_token=bot_token, plugins=dict(root="UTTAM/mplugin"))
-            try:
-                # Acquiring the lock to ensure sequential database access
-                async with db_lock:
-                    await ai.start()
-                    bot_info = await ai.get_me()
-                    await ai.set_bot_commands([
-                        BotCommand("start", "Start the bot"),
-                        BotCommand("clone", "Make your own reaction bot"),
-                        BotCommand("ping", "Check if the bot is alive or dead"),
-                        BotCommand("id", "Get users user_id"),
-                        BotCommand("stats", "Check bot stats"),
-                        BotCommand("gcast", "Broadcast any message to groups/users"),
-                    ])
 
-                    if bot_info.id not in CLONES:
-                        CLONES.add(bot_info.id)
-                    
-            except (AccessTokenExpired, AccessTokenInvalid):
-                # Locking the database to remove expired token
-                async with db_lock:
-                    await clonebotdb.delete_one({"token": bot_token})
-                logging.info(f"Removed expired or invalid token for bot ID: {bot['bot_id']}")
-            except Exception as e:
-                logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
+            # Retry logic for handling locked database errors
+            max_retries = 5
+            retries = 0
+
+            while retries < max_retries:
+                try:
+                    async with db_lock:
+                        await ai.start()
+                        bot_info = await ai.get_me()
+                        await ai.set_bot_commands([
+                            BotCommand("start", "Start the bot"),
+                            BotCommand("clone", "Make your own reaction bot"),
+                            BotCommand("ping", "Check if the bot is alive or dead"),
+                            BotCommand("id", "Get users user_id"),
+                            BotCommand("stats", "Check bot stats"),
+                            BotCommand("gcast", "Broadcast any message to groups/users"),
+                        ])
+
+                        if bot_info.id not in CLONES:
+                            CLONES.add(bot_info.id)
+                        break  # exit retry loop after successful start
+                except sqlite3.OperationalError as e:
+                    retries += 1
+                    logging.warning(f"Database locked. Retrying {retries}/{max_retries}...")
+                    if retries >= max_retries:
+                        logging.error(f"Failed to restart bot {bot_token} after {max_retries} attempts")
+                        break  # exit retry loop after max retries
+                except Exception as e:
+                    logging.exception(f"Error while restarting bot with token {bot_token}: {e}")
+                    break  # exit retry loop on other exceptions
             
         await asyncio.gather(*(restart_bot(bot) for bot in bots))
-        
+
     except Exception as e:
         logging.exception("Error while restarting bots.")
 
